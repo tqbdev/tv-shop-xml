@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="container-fluid custom-body">
+    <div style="background-color:#f8f8f8; margin: 10px; text-align: center">
+        <img src="http://localhost:1000?Ma_so_Xu_ly=Load_Anh&amp;Id=logo" class="logo" style="float: left" />
+        <h1 id="Html_Shop_Name" class="noselect title-logo"></h1>
+    </div>
+
+    <div id="FUNCTION_AREA" style="background-color:gray; margin: 10px">
+        <div id="Html_Query_Items" style="padding: 10px">
+        </div>
+        <div id="Html_Manage_Items" style="padding: 10px">
+            <div>
+                <h5 style="color: white;">Cập nhật đơn giá nhập:</h5>
+                <input id="Html_TV_Serinumber" spellcheck="no" autocomplete="off" placeholder="Mã số Tivi" value="" />
+                <input id="Html_Unit_Price" type="number" min="1" spellcheck="no" placeholder="Đơn giá nhập" autocomplete="off" value="" />
+                <div class="btn btn-danger" onclick="Func_Update_Import_Price()">Đồng ý</div>
+            </div>
+            <div id="Html_Group_TV" style="color: white;margin-top: 20px;">
+                <h5>Bảng thống kê nhóm tv với số lượng tồn:</h5>
+            </div>
+        </div>
+    </div>
+
+    <div id="RESULT_AREA" style="background-color:white; margin: 10px">
+    </div>
+</body>
+
+</html>
+<script src="js/js_Quan_ly_Nhap_hang.js"></script>
+<script>
+    //*************** Khởi động Đối tượng Thể hiện ************
+    var RESULT_AREA = document.getElementById("RESULT_AREA");
+    var Html_Shop_Name = document.getElementById("Html_Shop_Name");
+    var Html_Query_Items = document.getElementById("Html_Query_Items");
+    var Html_Group_TV = document.getElementById("Html_Group_TV");
+
+    //*************** Khởi động Dữ liệu  ************
+    var global_XML_Doc_Data = GET_XML_ITEMS_INFO()
+    var Shop_Info = GET_XML_SHOP_INFO().getElementsByTagName("Cua_hang")[0]
+    var List_Items_Data = global_XML_Doc_Data.getElementsByTagName("Tivi")
+    var group_TV_Statistic = Func_Group_TV_Amount(List_Items_Data)
+    var List_Items_Data_after_Query = List_Items_Data
+
+    //*************** Xuất thông tin   ************
+    Html_Shop_Name.innerHTML = Shop_Info.getAttribute("Ten")
+    window.parent.document.title = Shop_Info.getAttribute("Ten")
+
+    Html_Group_TV.appendChild(Create_Html_Group_Statistic(group_TV_Statistic));
+
+    var Html_List_Items = Create_Html_List_Items(List_Items_Data_after_Query)
+
+    RESULT_AREA.appendChild(Html_List_Items)
+
+    var Html_Input_Query_String = document.createElement("input")
+
+    Html_Input_Query_String.value = "Search..."
+
+    Html_Input_Query_String.onblur = function () {
+        if (Html_Input_Query_String.value == "") {
+            Html_Input_Query_String.value = "Search..."
+        }
+    }
+    Html_Input_Query_String.onfocus = function () {
+        if (Html_Input_Query_String.value == "Search...") {
+            Html_Input_Query_String.value = ""
+        }
+    }
+
+    Html_Input_Query_String.onkeyup = () => {
+        // Nhập
+        var Query_String = Html_Input_Query_String.value.trim()
+
+        // Xử lý 
+        if (Query_String != "") {
+            List_Items_Data_after_Query = Query_Items_by_String(Query_String, List_Items_Data)
+        } else {
+            List_Items_Data_after_Query = List_Items_Data
+        }
+
+        // Xuất
+        Html_List_Items = Create_Html_List_Items(List_Items_Data_after_Query)
+        RESULT_AREA.innerHTML = ""
+        RESULT_AREA.appendChild(Html_List_Items)
+
+        window.parent.resizeMainIframe();
+    }
+
+    Html_Query_Items.appendChild(Html_Input_Query_String)
+</script>
